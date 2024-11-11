@@ -50,3 +50,11 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Cache files
+CMakeUserPresets.json
+build
+.venv
+.vscode
+.pre-commit-config.yaml
+notes.md
