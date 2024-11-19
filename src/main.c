@@ -1,34 +1,12 @@
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/wait.h>
-#include <unistd.h>
-// #include "handlers.h"
-
-#define MAX_CMD_LEN 1024
-#define MAX_CWD_BUFFER 1024
-
-#define MAX_ARGS 100
+#include "handlers.h"
 
 char CWD[MAX_CWD_BUFFER], PWD[MAX_CWD_BUFFER], OLDPWD[MAX_CWD_BUFFER];
 char *USER, *HOSTNAME;
 
-void getCurrentPath()
-{
-
-    if (getcwd(CWD, sizeof(CWD)) == NULL)
-    {
-        perror("PATH LENGTH OUT OF BOUND");
-    }
-
-    printf("%s@%s:%s$  ", USER, HOSTNAME, CWD);
-}
-
 // Function to read and parse the command
 void read_command(char* cmd)
 {
-    getCurrentPath();
+    getCurrentPath(CWD, USER, HOSTNAME);
     fgets(cmd, MAX_CMD_LEN, stdin);
     cmd[strcspn(cmd, "\n")] = 0; // Remove the newline at the end of the input
 }
@@ -45,57 +23,6 @@ int parse_command(char* cmd, char** args)
         args[i] = strtok(NULL, " "); // Get the next arguments
     }
     return i; // Return the number of arguments
-}
-
-void handle_cd(char** args)
-{
-
-    if (args[1] == NULL || strcmp(args[1], "~") == 0)
-    {
-        // If no argument is passed, change to the home directory
-        char* home = getenv("HOME");
-        if (home == NULL)
-        {
-            fprintf(stderr, "cd: HOME not set\n");
-        }
-        else if (chdir(home) != 0)
-        {
-            perror("cd");
-        }
-        strcpy(OLDPWD, home);
-    }
-
-    else
-    {
-        // If a directory is passed, try to change to it
-        if (strcmp(args[1], "-") == 0)
-        {
-            // If the argument is "-", change to the previous directory
-
-            // Swap the current directory with the old directory
-            char tmp[MAX_CWD_BUFFER];
-            strcpy(tmp, PWD);
-            strcpy(PWD, OLDPWD);
-            strcpy(OLDPWD, tmp);
-
-            if (chdir(PWD) != 0)
-            {
-                perror("cd");
-            }
-        }
-        else
-        {
-            // Save the current directory as the old directory
-            getcwd(OLDPWD, sizeof(OLDPWD));
-            // Change to the specified directory
-            if (chdir(args[1]) != 0)
-            {
-                perror("cd");
-            }
-            // Save the new directory as the current directory
-            getcwd(PWD, sizeof(OLDPWD));
-        }
-    }
 }
 
 // Main function
@@ -116,15 +43,16 @@ int main()
         int arg_count = parse_command(cmd, args);
 
         // Check for exit condition
-        if (strcmp(args[0], "exit") == 0)
+        if ((strcmp(args[0], "exit") == 0) || (strcmp(args[0], "quit") == 0))
         {
+
             break;
         }
 
         // Check for change directory
         if (strcmp(args[0], "cd") == 0)
         {
-            handle_cd(args);
+            handle_cd(args, PWD, OLDPWD);
             continue; // Skip forking and executing a program
         }
 
