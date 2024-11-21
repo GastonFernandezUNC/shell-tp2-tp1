@@ -16,7 +16,45 @@ void env_vars(char** args, int args_count)
     }
 }
 
-int special_functions(char** args, char* PWD, char* OLDPWD)
+
+int check_redir(char** args){
+    int i = 0;
+    while (args[i] != NULL)
+    {
+        if ((strcmp(args[i], ">") == 0) || (strcmp(args[i], "<") == 0))
+        {
+            return 0;
+        }
+        i++;
+    }
+    return -1;
+}
+
+void redir_function(char** args)
+{
+    int i = 0;
+    while (args[i] != NULL)
+    {
+        if (strcmp(args[i], ">") == 0)
+        {
+            args[i] = NULL;
+            int fd = open(args[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            dup2(fd, STDOUT_FILENO);
+            close(fd);
+            return;
+        }
+        else if (strcmp(args[i], "<") == 0)
+        {
+            args[i] = NULL;
+            int fd = open(args[i + 1], O_RDONLY);
+            dup2(fd, STDIN_FILENO);
+            close(fd);
+            return;
+        }
+        i++;
+    }
+}
+int special_functions(char** args, char* PWD, char* OLDPWD, int arg_count)
 {
 
     if ((strcmp(args[0], "exit") == 0) || (strcmp(args[0], "quit") == 0))
@@ -24,13 +62,13 @@ int special_functions(char** args, char* PWD, char* OLDPWD)
         return -1;
     }
 
-    if (strcmp(args[0], "cd") == 0)
+    else if (strcmp(args[0], "cd") == 0)
     {
         handle_cd(args, PWD, OLDPWD);
         return 0; // Skip forking and executing a program
     }
 
-    if (strcmp(args[0], "clr") == 0)
+    else if (strcmp(args[0], "clr") == 0)
     {
         strcpy(args[0], "clear");
         return 1;

@@ -1,7 +1,7 @@
 #include "handlers.h"
 
 char CWD[MAX_CWD_BUFFER], PWD[MAX_CWD_BUFFER], OLDPWD[MAX_CWD_BUFFER];
-char *USER, *HOSTNAME;
+char *USER, HOSTNAME[MAX_CMD_LEN];
 int background_processes = 0;
 int current_child = -1;
 bool stop_requested = false;
@@ -37,6 +37,10 @@ void create_fork(int arg_count, char** args, bool background)
     if (pid == 0)
     {
         // In the child process: Execute the command
+        if (check_redir(args) == 0)
+        {
+            redir_function(args);
+        }
         if (execvp(args[0], args) == -1)
         {
             perror("execvp failed");
@@ -55,11 +59,11 @@ void create_fork(int arg_count, char** args, bool background)
 
             if (WIFSTOPPED(status))
             {
-                printf("\n%d Stopped\n",pid);
+                printf("\n%d Stopped\n", pid);
             }
             else if (WIFSIGNALED(status))
             {
-                printf("\n%d Killed\n",pid);
+                printf("\n%d Killed\n", pid);
             }
         }
         else
@@ -82,7 +86,7 @@ void sig_handler(int signo)
     {
         // Envía SIGINT al proceso hijo actual
         kill(current_child, signo);
-        printf("\nChild process %d terminated.\n", current_child);
+        // printf("");
         current_child = -1;
     }
     else
@@ -98,11 +102,13 @@ int main(int argc, char* argv[])
     signal(SIGINT, sig_handler);
     signal(SIGTSTP, sig_handler);
     signal(SIGQUIT, sig_handler);
+    signal(SIGCHLD, sig_handler);
+
 
     char cmd[MAX_CMD_LEN]; // Command buffer
     char* args[MAX_ARGS];  // Array of arguments
     USER = getenv("USER");
-    HOSTNAME = getenv("HOSTNAME");
+    gethostname(HOSTNAME, MAX_CMD_LEN);
 
     if (argc > 1)
     {
@@ -115,7 +121,7 @@ int main(int argc, char* argv[])
         {
             // printf("%s\n",commands[i]);
             int arg_count = parse_command(commands[i], args);
-            int opc = special_functions(args, PWD, OLDPWD);
+            int opc = special_functions(args, PWD, OLDPWD,argc);
 
             bool background = false;
             if (strcmp(args[arg_count - 1], "&") == 0)
@@ -150,7 +156,7 @@ int main(int argc, char* argv[])
         int arg_count = parse_command(cmd, args);
 
         // See if any of the arguments are within these
-        int opc = special_functions(args, PWD, OLDPWD);
+        int opc = special_functions(args, PWD, OLDPWD, arg_count);
 
         bool background = false;
         if (strcmp(args[arg_count - 1], "&") == 0)

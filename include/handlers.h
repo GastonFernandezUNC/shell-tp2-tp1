@@ -1,6 +1,6 @@
 #ifndef _HANDLERS_H
 #define _HANDLERS_H
-
+#include <fcntl.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -20,9 +20,13 @@ void getCurrentPath(char* CWD, char* USER, char* HOSTNAME);
 
 void handle_cd(char** args, char* PWD, char* OLDPWD);
 
-int special_functions(char** args, char* PWD, char* OLDPWD);
+int special_functions(char** args, char* PWD, char* OLDPWD, int arg_count);
 
 void env_vars(char** args, int args_count);
+
+void redir_function(char** args);
+
+int check_redir(char** args);
 
 char** commands_file(char* file, int* lines_amount);
 
