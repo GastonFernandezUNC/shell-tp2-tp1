@@ -9,6 +9,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#define _GNU_SOURCE
 #define MAX_CMD_LEN 1024
 #define MAX_CWD_BUFFER 1024
 

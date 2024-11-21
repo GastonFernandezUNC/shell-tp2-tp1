@@ -139,7 +139,7 @@ char** commands_file(char* file, int* lines_amount)
             if (!lines)
             {
                 perror("Error reallocating memory");
-                fclose(file);
+                fclose(fp);
                 return NULL;
             }
 
@@ -148,7 +148,7 @@ char** commands_file(char* file, int* lines_amount)
             if (!lines[*lines_amount])
             {
                 perror("Error duplicating string");
-                fclose(file);
+                fclose(fp);
                 return NULL;
             }
 

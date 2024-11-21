@@ -2,6 +2,9 @@
 
 char CWD[MAX_CWD_BUFFER], PWD[MAX_CWD_BUFFER], OLDPWD[MAX_CWD_BUFFER];
 char *USER, *HOSTNAME;
+int background_processes = 0;
+int current_child = -1;
+bool stop_requested = false;
 
 // Function to read and parse the command
 void read_command(char* cmd)
@@ -45,14 +48,26 @@ void create_fork(int arg_count, char** args, bool background)
         // In the parent process: Wait for the child to finish
         if (!background)
         {
+            int status;
             // wait(NULL);
-            waitpid(pid, NULL, 0);
+            current_child = pid;
+            waitpid(pid, &status, WUNTRACED);
+
+            if (WIFSTOPPED(status))
+            {
+                printf("\n%d Stopped\n",pid);
+            }
+            else if (WIFSIGNALED(status))
+            {
+                printf("\n%d Killed\n",pid);
+            }
         }
         else
         {
-            printf("Process running in background with PID %d\n", pid);
+            printf("[%d] %d\n", ++background_processes, pid);
             background = false;
         }
+        current_child = -1;
     }
     else
     {
@@ -61,9 +76,28 @@ void create_fork(int arg_count, char** args, bool background)
     }
 }
 
+void sig_handler(int signo)
+{
+    if (current_child > 0)
+    {
+        // Envía SIGINT al proceso hijo actual
+        kill(current_child, signo);
+        printf("\nChild process %d terminated.\n", current_child);
+        current_child = -1;
+    }
+    else
+    {
+        printf("\n");
+    }
+}
+
 // Main function
 int main(int argc, char* argv[])
 {
+
+    signal(SIGINT, sig_handler);
+    signal(SIGTSTP, sig_handler);
+    signal(SIGQUIT, sig_handler);
 
     char cmd[MAX_CMD_LEN]; // Command buffer
     char* args[MAX_ARGS];  // Array of arguments
@@ -80,7 +114,7 @@ int main(int argc, char* argv[])
         while (i < lines_amount)
         {
             // printf("%s\n",commands[i]);
-            int arg_count = parse_command(commands[i],args);
+            int arg_count = parse_command(commands[i], args);
             int opc = special_functions(args, PWD, OLDPWD);
 
             bool background = false;
