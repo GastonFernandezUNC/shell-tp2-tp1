@@ -41,6 +41,7 @@ void create_fork(int arg_count, char** args, bool background)
         {
             redir_function(args);
         }
+
         if (execvp(args[0], args) == -1)
         {
             perror("execvp failed");
@@ -104,7 +105,6 @@ int main(int argc, char* argv[])
     signal(SIGQUIT, sig_handler);
     signal(SIGCHLD, sig_handler);
 
-
     char cmd[MAX_CMD_LEN]; // Command buffer
     char* args[MAX_ARGS];  // Array of arguments
     USER = getenv("USER");
@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
         {
             // printf("%s\n",commands[i]);
             int arg_count = parse_command(commands[i], args);
-            int opc = special_functions(args, PWD, OLDPWD,argc);
+            int opc = special_functions(args, PWD, OLDPWD, argc);
 
             bool background = false;
             if (strcmp(args[arg_count - 1], "&") == 0)
@@ -171,6 +171,13 @@ int main(int argc, char* argv[])
         }
         if (opc == 0)
         {
+            continue;
+        }
+
+        int pipes_count = check_pipe(args);
+        if (pipes_count > 0)
+        {
+            pipe_function(args, pipes_count);
             continue;
         }
 

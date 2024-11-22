@@ -16,8 +16,8 @@ void env_vars(char** args, int args_count)
     }
 }
 
-
-int check_redir(char** args){
+int check_redir(char** args)
+{
     int i = 0;
     while (args[i] != NULL)
     {
@@ -54,6 +54,97 @@ void redir_function(char** args)
         i++;
     }
 }
+
+int check_pipe(char** args)
+{
+
+    int i = 0, pipes = -1;
+    while (args[i] != NULL)
+    {
+        if ((strcmp(args[i], "|") == 0))
+        {
+            pipes == -1 ? pipes = 0 : pipes;
+            pipes++;
+        }
+        i++;
+    }
+
+    int commands = pipes + 1;
+    return commands;
+}
+
+void pipe_function(char** args, int command_count)
+{
+    int pipes[command_count - 1][2];
+    for (int i = 0; i < command_count - 1; i++)
+    {
+        if (pipe(pipes[i]) == -1)
+        {
+            perror("pipe");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    int cmd_start = 0; // Índice inicial del comando actual
+    for (int i = 0; i < command_count; i++)
+    {
+        if (fork() == 0)
+        {
+            // Redirigir entrada estándar si no es el primer comando
+            if (i != 0)
+            {
+                dup2(pipes[i - 1][0], STDIN_FILENO);
+            }
+            // Redirigir salida estándar si no es el último comando
+            if (i != command_count - 1)
+            {
+                dup2(pipes[i][1], STDOUT_FILENO);
+            }
+
+            // Cerrar todos los pipes en el hijo
+            for (int j = 0; j < command_count - 1; j++)
+            {
+                close(pipes[j][0]);
+                close(pipes[j][1]);
+            }
+
+            // Construir los argumentos del comando actual
+            char* cmd_args[100]; // Máximo de 100 argumentos
+            int k = 0;
+            while (args[cmd_start] != NULL && strcmp(args[cmd_start], "|") != 0)
+            {
+                cmd_args[k++] = args[cmd_start++];
+            }
+            cmd_args[k] = NULL; // Terminar lista de argumentos
+
+            // Ejecutar el comando
+            execvp(cmd_args[0], cmd_args);
+            perror("execvp");
+            exit(EXIT_FAILURE);
+        }
+
+        // Avanzar cmd_start al siguiente comando (saltando el '|')
+        while (args[cmd_start] != NULL && strcmp(args[cmd_start], "|") != 0)
+        {
+            cmd_start++;
+        }
+        cmd_start++; // Saltar el '|'
+    }
+
+    // Cerrar todos los pipes en el proceso principal
+    for (int i = 0; i < command_count - 1; i++)
+    {
+        close(pipes[i][0]);
+        close(pipes[i][1]);
+    }
+
+    // Esperar a los procesos hijos
+    for (int i = 0; i < command_count; i++)
+    {
+        wait(NULL);
+    }
+}
+
 int special_functions(char** args, char* PWD, char* OLDPWD, int arg_count)
 {
 

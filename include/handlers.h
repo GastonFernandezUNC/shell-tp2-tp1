@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -27,6 +28,10 @@ void env_vars(char** args, int args_count);
 void redir_function(char** args);
 
 int check_redir(char** args);
+
+int check_pipe(char** args);
+
+void pipe_function(char** args, int command_count);
 
 char** commands_file(char* file, int* lines_amount);
 
