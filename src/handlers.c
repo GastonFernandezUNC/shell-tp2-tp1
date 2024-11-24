@@ -145,24 +145,42 @@ void pipe_function(char** args, int command_count)
     }
 }
 
-int special_functions(char** args, char* PWD, char* OLDPWD, int arg_count)
+int special_functions(char** args, char* PWD, char* OLDPWD, int* background_processes, int* monitor_pid)
 {
 
     if ((strcmp(args[0], "exit") == 0) || (strcmp(args[0], "quit") == 0))
     {
-        return -1;
+        if(*monitor_pid != -1){
+            stop_monitor(background_processes, monitor_pid);
+        }
+        return EXIT;
     }
 
     else if (strcmp(args[0], "cd") == 0)
     {
         handle_cd(args, PWD, OLDPWD);
-        return 0; // Skip forking and executing a program
+        return CONTINUE; // Skip forking and executing a program
     }
 
     else if (strcmp(args[0], "clr") == 0)
     {
         strcpy(args[0], "clear");
-        return 1;
+        return FORK; // Fork and execute the program
+    }
+
+    if(strcmp(args[0], "start_monitor") == 0){
+        start_monitor(background_processes, monitor_pid);
+        return CONTINUE;
+    }
+
+    if(strcmp(args[0], "stop_monitor") == 0){
+        stop_monitor(background_processes, monitor_pid);
+        return CONTINUE;
+    }
+
+    if(strcmp(args[0], "status_monitor") == 0){
+        status_monitor(background_processes, monitor_pid);
+        return CONTINUE;
     }
 
     return -2;

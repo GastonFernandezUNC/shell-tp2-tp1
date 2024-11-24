@@ -1,10 +1,12 @@
 #include "handlers.h"
+#include <cjson/cJSON.h>
 
 char CWD[MAX_CWD_BUFFER], PWD[MAX_CWD_BUFFER], OLDPWD[MAX_CWD_BUFFER];
 char *USER, HOSTNAME[MAX_CMD_LEN];
 int background_processes = 0;
 int current_child = -1;
 bool stop_requested = false;
+pid_t monitor_pid = -1;
 
 // Function to read and parse the command
 void read_command(char* cmd)
@@ -121,7 +123,7 @@ int main(int argc, char* argv[])
         {
             // printf("%s\n",commands[i]);
             int arg_count = parse_command(commands[i], args);
-            int opc = special_functions(args, PWD, OLDPWD, argc);
+            int opc = special_functions(args, PWD, OLDPWD, &background_processes, &monitor_pid);
 
             bool background = false;
             if (strcmp(args[arg_count - 1], "&") == 0)
@@ -156,7 +158,7 @@ int main(int argc, char* argv[])
         int arg_count = parse_command(cmd, args);
 
         // See if any of the arguments are within these
-        int opc = special_functions(args, PWD, OLDPWD, arg_count);
+        int opc = special_functions(args, PWD, OLDPWD, &background_processes, &monitor_pid);
 
         bool background = false;
         if (strcmp(args[arg_count - 1], "&") == 0)

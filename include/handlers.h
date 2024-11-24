@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include "monitor.h"
 
 #define _GNU_SOURCE
 #define MAX_CMD_LEN 1024
@@ -17,11 +18,15 @@
 #define MAX_ARGS 100
 #define FILE_BUFFER_SIZE 1024
 
+#define CONTINUE 0
+#define FORK 1
+#define EXIT -1
+
 void getCurrentPath(char* CWD, char* USER, char* HOSTNAME);
 
 void handle_cd(char** args, char* PWD, char* OLDPWD);
 
-int special_functions(char** args, char* PWD, char* OLDPWD, int arg_count);
+int special_functions(char** args, char* PWD, char* OLDPWD, int* background_processes, int* monitor_pid);
 
 void env_vars(char** args, int args_count);
 
