@@ -10,6 +10,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include "monitor.h"
+#include "cjson_handler.h"
 
 #define _GNU_SOURCE
 #define MAX_CMD_LEN 1024

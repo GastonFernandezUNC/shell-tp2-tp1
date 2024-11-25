@@ -16,7 +16,7 @@ include_directories(include)
 find_package(cJSON REQUIRED)
 find_package(unity REQUIRED)
 
-add_executable(${PROJECT_NAME} src/main.c src/handlers.c src/monitor.c)
+add_executable(${PROJECT_NAME} src/main.c src/handlers.c src/monitor.c src/cjson_handler.c)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE cjson::cjson)
 target_link_libraries(${PROJECT_NAME} PRIVATE unity::unity)

@@ -183,6 +183,11 @@ int special_functions(char** args, char* PWD, char* OLDPWD, int* background_proc
         return CONTINUE;
     }
 
+    if(strcmp(args[0], "config_monitor") == 0){
+        config_monitor(args);
+        return CONTINUE;
+    }
+
     return -2;
 }
 

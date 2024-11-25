@@ -1,32 +1,20 @@
 {
-    "refresh_time":"1",
-    "metrics":{
-        "cpu":{
-            "enabled":true
-        },
-        "memory":{
-            "memory_percentage":true,
-            "memory_available":true,
-            "memory_used":true,
-            "memory_total":true
-        },
-        "disk":{
-            "reads_completed_successfully":true,
-            "writes_completed":true,
-            "reads_per_second":true,
-            "writes_per_second":true
-        },
-        "network":{
-            "rx_bytes":true,
-            "tx_bytes":true,
-            "rx_packets":true,
-            "tx_packets":true,
-            "rx_errors":true,
-            "tx_errors":true
-        },
-        "proc_stats":{
-            "coontent_switching":true,
-            "running_processes":true
-        }
-    }
+	"refresh_time":	1,
+	"metrics":	{
+		"cpu":	{
+			"enabled":	true
+		},
+		"memory":	{
+			"enabled":	true
+		},
+		"disk":	{
+			"enabled":	true
+		},
+		"network":	{
+			"enabled":	true
+		},
+		"proc_stats":	{
+			"enabled":	true
+		}
+	}
 }
