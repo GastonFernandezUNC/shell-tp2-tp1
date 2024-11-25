@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <strings.h>
 #include <string.h>
-#define PATH_TO_METRICS "../so-i-24-GastonFernandezUNC/bin/metrics"
+#define PATH_TO_METRICS "../so-i-24-GastonFernandezUNC/build/metrics"
 #define PATH_TO_FIFO "/tmp/monitor_fifo"
 #define MAX_FIFO_BUFFER 1024
 #define FILE_PERMISSIONS 0666
@@ -57,10 +57,8 @@ void read_fifo(int* background_processes, pid_t* monitor)
         exit(EXIT_FAILURE);
     }
 
-    
     while ((bytesRead = read(fd, buffer, sizeof(buffer) - 1)) > 0)
     {
-
         buffer[bytesRead] = '\0'; // Null-terminate the buffer
         char* stop_command = "status_stop";
         if( strncasecmp(buffer, stop_command, strlen(stop_command)) == 0) break;
@@ -93,6 +91,13 @@ void write_fifo(int* background_processes, pid_t* monitor)
 
     char* message = "status\n";
     bytesWritten = write(fd, message, strlen(message));
+    if (bytesWritten == -1)
+    {
+        perror("write");
+    }
+    
+    char* clean_message = "clean\n";
+    bytesWritten = write(fd, clean_message, strlen(clean_message));
     if (bytesWritten == -1)
     {
         perror("write");
