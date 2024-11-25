@@ -81,6 +81,7 @@ void write_fifo(int* background_processes, pid_t* monitor)
     fd = open(PATH_TO_FIFO, O_WRONLY);
     if (fd == -1)
     {
+        printf("ERROR PTH FIFO\n");
         if (mkfifo(PATH_TO_FIFO, FILE_PERMISSIONS) == -1)
         {
             perror("mkfifo");
@@ -96,12 +97,6 @@ void write_fifo(int* background_processes, pid_t* monitor)
         perror("write");
     }
     
-    char* clean_message = "clean\n";
-    bytesWritten = write(fd, clean_message, strlen(clean_message));
-    if (bytesWritten == -1)
-    {
-        perror("write");
-    }
     close(fd);
 }
 
@@ -113,7 +108,6 @@ void status_monitor(int* background_processes, pid_t* monitor)
     }
     else{
         write_fifo(background_processes, monitor);
-        // sleep(METRICS_READING_DELAY);
         read_fifo(background_processes, monitor);
     }
 }
