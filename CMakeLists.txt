@@ -20,7 +20,7 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fprofile-arcs -ftest-covera
 # Include headers
 include_directories(include)
 include_directories(include/cjson)
-add_subdirectory(so-i-24-GastonFernandezUNC)
+add_subdirectory(metrics-tp1-so1)
 add_subdirectory(test_folder)
 
 # Conan setup
