@@ -1,108 +1,17 @@
-#include "handlers.h"
-#include <cjson/cJSON.h>
-
-char CWD[MAX_CWD_BUFFER], PWD[MAX_CWD_BUFFER], OLDPWD[MAX_CWD_BUFFER];
-char *USER, HOSTNAME[MAX_CMD_LEN];
-int background_processes = 0;
-int current_child = -1;
-bool stop_requested = false;
-pid_t monitor_pid = -1;
-
-// Function to read and parse the command
-void read_command(char* cmd)
-{
-    getCurrentPath(CWD, USER, HOSTNAME);
-    fgets(cmd, MAX_CMD_LEN, stdin);
-    cmd[strcspn(cmd, "\n")] = 0; // Remove the newline at the end of the input
-}
-
-// Function to parse the command into program and arguments
-int parse_command(char* cmd, char** args)
-{
-    int i = 0;
-    args[i] = strtok(cmd, " "); // Get the first argument
-
-    while (args[i] != NULL)
-    {
-        i++;
-        args[i] = strtok(NULL, " "); // Get the next arguments
-    }
-
-    env_vars(args, i);
-
-    return i; // Return the number of arguments
-}
-
-void create_fork(int arg_count, char** args, bool background)
-{
-    pid_t pid = fork();
-    if (pid == 0)
-    {
-        // In the child process: Execute the command
-        if (check_redir(args) == 0)
-        {
-            redir_function(args);
-        }
-
-        if (execvp(args[0], args) == -1)
-        {
-            perror("execvp failed");
-            exit(1);
-        }
-    }
-    else if (pid > 0)
-    {
-        // In the parent process: Wait for the child to finish
-        if (!background)
-        {
-            int status;
-            // wait(NULL);
-            current_child = pid;
-            waitpid(pid, &status, WUNTRACED);
-
-            if (WIFSTOPPED(status))
-            {
-                printf("\n%d Stopped\n", pid);
-            }
-            else if (WIFSIGNALED(status))
-            {
-                printf("\n%d Killed\n", pid);
-            }
-        }
-        else
-        {
-            printf("[%d] %d\n", ++background_processes, pid);
-            background = false;
-        }
-        current_child = -1;
-    }
-    else
-    {
-        perror("fork failed");
-        exit(1);
-    }
-}
-
-void sig_handler(int signo)
-{
-    if (current_child > 0)
-    {
-        // Envía SIGINT al proceso hijo actual
-        kill(current_child, signo);
-        // printf("");
-        current_child = -1;
-    }
-    else
-    {
-        printf("\n");
-    }
-}
+#include "shell.h"
 
 // Main function
 int main(int argc, char* argv[])
 {
 
-    signal(SIGINT, sig_handler);
+    char CWD[MAX_CWD_BUFFER], PWD[MAX_CWD_BUFFER], OLDPWD[MAX_CWD_BUFFER];
+    char *USER, HOSTNAME[MAX_CMD_LEN];
+    int background_processes = 0;
+    int current_child = -1;
+    bool stop_requested = false;
+    pid_t monitor_pid = -1;
+
+    signal(SIGINT,  sig_handler);
     signal(SIGTSTP, sig_handler);
     signal(SIGQUIT, sig_handler);
     signal(SIGCHLD, sig_handler);
@@ -141,7 +50,7 @@ int main(int argc, char* argv[])
                 continue;
             }
 
-            create_fork(arg_count, args, background);
+            create_fork(args, background, &current_child, &background_processes);
 
             i++;
         }
@@ -150,7 +59,7 @@ int main(int argc, char* argv[])
 
     while (1)
     {
-        read_command(cmd); // Get the command from user
+        read_command(cmd, CWD, USER, HOSTNAME); // Get the command from user
         if (strlen(cmd) == 0)
             continue; // Skip empty input
 
@@ -184,7 +93,7 @@ int main(int argc, char* argv[])
         }
 
         // Create a child process to execute the command
-        create_fork(arg_count, args, background);
+        create_fork(args, background, &current_child, &background_processes);
     }
 
     return 0;

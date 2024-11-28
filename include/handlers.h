@@ -1,16 +1,9 @@
 #ifndef _HANDLERS_H
 #define _HANDLERS_H
-#include <fcntl.h>
-#include <signal.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include "monitor.h"
+
 #include "cjson_handler.h"
+#include "monitor.h"
+#include <sys/wait.h>
 
 #define _GNU_SOURCE
 #define MAX_CMD_LEN 1024

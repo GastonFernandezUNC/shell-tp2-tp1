@@ -150,7 +150,8 @@ int special_functions(char** args, char* PWD, char* OLDPWD, int* background_proc
 
     if ((strcmp(args[0], "exit") == 0) || (strcmp(args[0], "quit") == 0))
     {
-        if(*monitor_pid != -1){
+        if (*monitor_pid != -1)
+        {
             stop_monitor(background_processes, monitor_pid);
         }
         return EXIT;
@@ -168,22 +169,26 @@ int special_functions(char** args, char* PWD, char* OLDPWD, int* background_proc
         return FORK; // Fork and execute the program
     }
 
-    if(strcmp(args[0], "start_monitor") == 0){
+    if (strcmp(args[0], "start_monitor") == 0)
+    {
         start_monitor(background_processes, monitor_pid);
         return CONTINUE;
     }
 
-    if(strcmp(args[0], "stop_monitor") == 0){
+    if (strcmp(args[0], "stop_monitor") == 0)
+    {
         stop_monitor(background_processes, monitor_pid);
         return CONTINUE;
     }
 
-    if(strcmp(args[0], "status_monitor") == 0){
+    if (strcmp(args[0], "status_monitor") == 0)
+    {
         status_monitor(background_processes, monitor_pid);
         return CONTINUE;
     }
 
-    if(strcmp(args[0], "config_monitor") == 0){
+    if (strcmp(args[0], "config_monitor") == 0)
+    {
         config_monitor(args);
         return CONTINUE;
     }

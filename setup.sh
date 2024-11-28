@@ -1,5 +1,10 @@
 #!bin/bash
 
+delete()
+{
+	rm -rf build CMakeUserPresets.json
+}
+
 setConan()
 {
 
@@ -27,18 +32,21 @@ exit 1;
 fi
 
 if [ $option -eq 0 ];then
+	delete
 	setConan default
 	setCMAKE Release
 	exit 0
 fi
 
 if [ $option -eq 1 ];then
+	delete
 	setConan debug
 	setCMAKE Debug
 	exit 0
 fi
 
 if [ $option -eq 2 ];then
+	delete
 	echo "This way the project will be build with the debug profile"
 	setConan debug
 	exit 0
@@ -46,7 +54,7 @@ fi
 
 if [ $option -eq 3 ];then
 
-	rm -rf build CMakeUserPresets.json
+	delete
 	exit 0
 fi
 

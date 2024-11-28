@@ -1,19 +1,4 @@
-// #include "monitor.h"
-#include <fcntl.h>
-#include <signal.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <strings.h>
-#include <string.h>
-#define PATH_TO_METRICS "../so-i-24-GastonFernandezUNC/build/metrics"
-#define PATH_TO_FIFO "/tmp/monitor_fifo"
-#define MAX_FIFO_BUFFER 1024
-#define FILE_PERMISSIONS 0666
-#define METRICS_READING_DELAY 1
+#include "monitor.h"
 
 void start_monitor(int* background_processes, pid_t* monitor)
 {
@@ -45,7 +30,7 @@ void stop_monitor(int* background_processes, pid_t* monitor)
     }
 }
 
-void read_fifo(int* background_processes, pid_t* monitor)
+void read_fifo(void)
 {
     char buffer[MAX_FIFO_BUFFER];
     int fd;
@@ -61,8 +46,9 @@ void read_fifo(int* background_processes, pid_t* monitor)
     {
         buffer[bytesRead] = '\0'; // Null-terminate the buffer
         char* stop_command = "status_stop";
-        if( strncasecmp(buffer, stop_command, strlen(stop_command)) == 0) break;
-        
+        if (strncasecmp(buffer, stop_command, strlen(stop_command)) == 0)
+            break;
+
         printf("%s", buffer);
     }
 
@@ -77,7 +63,6 @@ void write_fifo(int* background_processes, pid_t* monitor)
 {
     int fd;
     ssize_t bytesWritten;
-    char buffer[MAX_FIFO_BUFFER];
     fd = open(PATH_TO_FIFO, O_WRONLY);
     if (fd == -1)
     {
@@ -87,7 +72,8 @@ void write_fifo(int* background_processes, pid_t* monitor)
             perror("mkfifo");
             exit(EXIT_FAILURE);
         }
-        return write_fifo(background_processes, monitor);
+        write_fifo(background_processes, monitor);
+        return;
     }
 
     char* message = "status\n";
@@ -96,7 +82,7 @@ void write_fifo(int* background_processes, pid_t* monitor)
     {
         perror("write");
     }
-    
+
     close(fd);
 }
 
@@ -106,8 +92,9 @@ void status_monitor(int* background_processes, pid_t* monitor)
     {
         printf("Monitor is not running\n");
     }
-    else{
+    else
+    {
         write_fifo(background_processes, monitor);
-        read_fifo(background_processes, monitor);
+        read_fifo();
     }
 }

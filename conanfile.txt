@@ -2,6 +2,7 @@
 
 	unity/2.6.0
 	cjson/1.7.18
+	libmicrohttpd/0.9.77
 
 [generators]
 

@@ -1,10 +1,6 @@
 #include "cjson_handler.h"
 
-#define FILE_BUFFER_SIZE 1024
-#define INITIAL_SIZE 1024
-#define PATH_TO_CONFIG_FILE "../config.json"
-
-char* _get_json()
+char* _get_json(void)
 {
     FILE* fp;
     char* content = NULL;
@@ -15,7 +11,7 @@ char* _get_json()
     if (fp == NULL)
     {
         perror("Error opening file");
-        return -1;
+        return FAILED_EXIT;
     }
 
     // Allocate initial memory for content
@@ -24,7 +20,7 @@ char* _get_json()
     {
         perror("Memory allocation failed");
         fclose(fp);
-        return -1;
+        return FAILED_EXIT;
     }
     content[0] = '\0'; // Initialize empty string
 
@@ -42,7 +38,7 @@ char* _get_json()
                 perror("Memory reallocation failed");
                 free(content);
                 fclose(fp);
-                return -1;
+                return FAILED_EXIT;
             }
             content = temp;
         }
@@ -56,24 +52,28 @@ char* _get_json()
     return content;
 }
 
-int save_to_config_file(cJSON* json) {
+int save_to_config_file(cJSON* json)
+{
     // Serialize JSON to string
-    char* updated_json = cJSON_Print(json);  // Use cJSON_PrintUnformatted() if you don't want pretty formatting.
-    if (updated_json == NULL) {
+    char* updated_json = cJSON_Print(json); // Use cJSON_PrintUnformatted() if you don't want pretty formatting.
+    if (updated_json == NULL)
+    {
         perror("Failed to serialize JSON");
         return EXIT_FAILURE;
     }
 
     // Open the file for writing
     FILE* fp = fopen(PATH_TO_CONFIG_FILE, "w");
-    if (fp == NULL) {
+    if (fp == NULL)
+    {
         perror("Error opening file for writing");
         free(updated_json); // Free the serialized JSON string
         return EXIT_FAILURE;
     }
 
     // Write the JSON string to the file
-    if (fputs(updated_json, fp) == EOF) {
+    if (fputs(updated_json, fp) == EOF)
+    {
         perror("Error writing JSON to file");
         fclose(fp);
         free(updated_json);
@@ -86,25 +86,33 @@ int save_to_config_file(cJSON* json) {
     return EXIT_SUCCESS;
 }
 
-
-int _write_json(cJSON* json, char* metric, bool option, int time) {
-    if (time > 0) {
+int _write_json(cJSON* json, char* metric, bool option, int time)
+{
+    if (time > 0)
+    {
         cJSON* refresh_time = cJSON_GetObjectItem(json, "refresh_time");
-        if (refresh_time) {
+        if (refresh_time)
+        {
             cJSON_SetNumberValue(refresh_time, time);
-        } else {
+        }
+        else
+        {
             cJSON_AddNumberToObject(json, "refresh_time", time);
         }
         return EXIT_SUCCESS;
     }
 
-    if (metric != NULL) {
+    if (metric != NULL)
+    {
         cJSON* metrics = cJSON_GetObjectItem(json, "metrics");
-        if (metrics) {
+        if (metrics)
+        {
             cJSON* specific_metric = cJSON_GetObjectItem(metrics, metric);
-            if (specific_metric && cJSON_IsObject(specific_metric)) {
+            if (specific_metric && cJSON_IsObject(specific_metric))
+            {
                 cJSON* enabled = cJSON_GetObjectItem(specific_metric, "enabled");
-                if (enabled && cJSON_IsBool(enabled)) {
+                if (enabled && cJSON_IsBool(enabled))
+                {
                     cJSON_SetBoolValue(enabled, option);
                 }
             }
@@ -114,28 +122,30 @@ int _write_json(cJSON* json, char* metric, bool option, int time) {
     return EXIT_SUCCESS;
 }
 
-
 int config_monitor(char** args)
 {
 
     char* content = _get_json();
-    printf("File content:\n%s", content);
-    
-    if (args[1] == NULL || strcmp(args[1], "-D") != 0 && strcmp(args[1], "-d") != 0 && strcmp(args[1], "-A") != 0 &&
-                               strcmp(args[1], "-a") != 0 && strcmp(args[1], "--help") != 0 &&
-                               strcmp(args[1], "--h") != 0 && strcmp(args[1], "-n") != 0 && strcmp(args[1], "-N") != 0)
-    {
-        printf("Invalid argument\nValid arguments are\n-D -d: Deactivate\n-A -a: Activate\n"
-               "-N -n: Set refresh time\n");
+
+ if (args[1] == NULL || 
+    (strcmp(args[1], "-D") != 0 && strcmp(args[1], "-d") != 0 &&
+     strcmp(args[1], "-A") != 0 && strcmp(args[1], "-a") != 0 &&
+     strcmp(args[1], "--help") != 0 && strcmp(args[1], "--h") != 0 &&
+     strcmp(args[1], "-n") != 0 && strcmp(args[1], "-N") != 0))
+   {
+        printf(
+            "\nInvalid argument\n\nValid arguments are\n-D -d: Deactivate\n-A -a: Activate\n-N -n: Set refresh time\n"
+            "-help --h: Display help\n\n");
         return -1;
     }
 
     if (strcmp(args[1], "--help") == 0 || strcmp(args[1], "--h") == 0)
     {
-        printf("Valid arguments are\n-D -d: Deactivate\n-A -a: Activate\n");
-        printf("To activate or deactivate the of any metric, use the following format:\n"
+        printf("\nValid arguments are\n-D -d: Deactivate\n-A -a: Activate\n-help --h: Display help\n"
+               "-N -n: Set refresh time\n");
+        printf("\nTo activate or deactivate the of any metric, use the following format:\n"
                "config_monitor -d|-D|-a|-A <metric>\n");
-        printf("Valid metrics are:\n"
+        printf("\nValid metrics are:\n"
                "   - cpu\n"
                "   - memory\n"
                "   - disk\n"
@@ -157,7 +167,7 @@ int config_monitor(char** args)
         }
         else
         {
-            printf("Invalid metric option\nCheck --help for valid options\n");
+            printf("\nInvalid metric option\nCheck --help for valid options\n");
             return EXIT_FAILURE;
         }
     }
@@ -173,7 +183,6 @@ int config_monitor(char** args)
         }
     }
 
-
     cJSON* json = cJSON_Parse(content);
     if (json == NULL)
     {
@@ -184,6 +193,8 @@ int config_monitor(char** args)
     _write_json(json, metric, option, time);
     save_to_config_file(json);
 
+    content = _get_json();
+    printf("File content:\n%s", content);
     free(content);
     cJSON_Delete(json);
     return EXIT_SUCCESS;
