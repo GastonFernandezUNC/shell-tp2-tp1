@@ -15,6 +15,7 @@
 #define CONTINUE 0
 #define FORK 1
 #define EXIT -1
+#define NOTHING -2
 
 void getCurrentPath(char* CWD, char* USER, char* HOSTNAME);
 

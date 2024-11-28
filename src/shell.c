@@ -1,7 +1,7 @@
 #include "shell.h"
 
 // Function to read and parse the command
-void read_command(char* cmd,  char* CWD, char* USER, char* HOSTNAME)
+void read_command(char* cmd, char* CWD, char* USER, char* HOSTNAME)
 {
     getCurrentPath(CWD, USER, HOSTNAME);
     fgets(cmd, MAX_CMD_LEN, stdin);

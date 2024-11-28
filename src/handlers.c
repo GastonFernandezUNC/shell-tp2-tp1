@@ -193,7 +193,7 @@ int special_functions(char** args, char* PWD, char* OLDPWD, int* background_proc
         return CONTINUE;
     }
 
-    return -2;
+    return NOTHING;
 }
 
 void getCurrentPath(char* CWD, char* USER, char* HOSTNAME)

@@ -127,12 +127,10 @@ int config_monitor(char** args)
 
     char* content = _get_json();
 
- if (args[1] == NULL || 
-    (strcmp(args[1], "-D") != 0 && strcmp(args[1], "-d") != 0 &&
-     strcmp(args[1], "-A") != 0 && strcmp(args[1], "-a") != 0 &&
-     strcmp(args[1], "--help") != 0 && strcmp(args[1], "--h") != 0 &&
-     strcmp(args[1], "-n") != 0 && strcmp(args[1], "-N") != 0))
-   {
+    if (args[1] == NULL || (strcmp(args[1], "-D") != 0 && strcmp(args[1], "-d") != 0 && strcmp(args[1], "-A") != 0 &&
+                            strcmp(args[1], "-a") != 0 && strcmp(args[1], "--help") != 0 &&
+                            strcmp(args[1], "--h") != 0 && strcmp(args[1], "-n") != 0 && strcmp(args[1], "-N") != 0))
+    {
         printf(
             "\nInvalid argument\n\nValid arguments are\n-D -d: Deactivate\n-A -a: Activate\n-N -n: Set refresh time\n"
             "-help --h: Display help\n\n");

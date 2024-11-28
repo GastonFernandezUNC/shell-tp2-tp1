@@ -4,13 +4,26 @@ description: "Executes a compilation."
 runs:
   using: "composite"
   steps:
+    - name: Set up Conan
+      shell: bash
+      run: |
+        pip install conan
+        conan --version
+        conan profile detect --force  # Detectar y crear un perfil por defecto
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        sudo apt update
+        sudo apt install libmicrohttpd-dev
+        echo "Running Conan install"
+        mkdir -p build && cd build
+        conan install .. --build=missing -s build_type=Release
+
     - name: Compile
       shell: bash
       run: |
-
-        SRC_FOLDER=$(pwd)/src
-
-        echo "Running command: cmake -DRUN_COVERAGE=1 .. && make -j2"
-
-        mkdir -p build && cd build
-        cmake -DRUN_COVERAGE=1 -DENABLE_CJSON_TEST=OFF .. && make -j2
+        echo "Running CMake build"
+        cd build
+        cmake .. -DCMAKE_TOOLCHAIN_FILE=./build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+        make

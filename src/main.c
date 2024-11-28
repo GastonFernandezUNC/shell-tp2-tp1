@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
     bool stop_requested = false;
     pid_t monitor_pid = -1;
 
-    signal(SIGINT,  sig_handler);
+    signal(SIGINT, sig_handler);
     signal(SIGTSTP, sig_handler);
     signal(SIGQUIT, sig_handler);
     signal(SIGCHLD, sig_handler);
@@ -41,11 +41,11 @@ int main(int argc, char* argv[])
                 background = true;
             }
 
-            if (opc == -1)
+            if (opc == EXIT)
             {
                 break;
             }
-            if (opc == 0)
+            if (opc == CONTINUE)
             {
                 continue;
             }
@@ -76,11 +76,11 @@ int main(int argc, char* argv[])
             background = true;
         }
 
-        if (opc == -1)
+        if (opc == EXIT)
         {
             break;
         }
-        if (opc == 0)
+        if (opc == CONTINUE)
         {
             continue;
         }

@@ -24,5 +24,4 @@ void status_monitor(int* background_processes, pid_t* monitor);
 void read_fifo(void);
 void write_fifo(int* background_processes, pid_t* monitor);
 
-
 #endif
