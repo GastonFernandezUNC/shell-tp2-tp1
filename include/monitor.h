@@ -12,7 +12,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define PATH_TO_METRICS "so-i-24-GastonFernandezUNC/metrics"
+#define PATH_TO_METRICS "./metrics-tp1-so1/metrics"
 #define PATH_TO_FIFO "/tmp/monitor_fifo"
 #define MAX_FIFO_BUFFER 1024
 #define FILE_PERMISSIONS 0666

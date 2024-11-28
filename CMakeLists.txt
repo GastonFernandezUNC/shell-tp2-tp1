@@ -19,7 +19,6 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fprofile-arcs -ftest-covera
 
 # Include headers
 include_directories(include)
-include_directories(include/cjson)
 add_subdirectory(metrics-tp1-so1)
 add_subdirectory(test_folder)
 
@@ -30,7 +29,6 @@ find_package(unity REQUIRED)
 # Add executables
 add_executable(${PROJECT_NAME} src/main.c
         src/cjson_handler.c
-        src/cJSON.c
         src/handlers.c
         src/monitor.c
         src/shell.c

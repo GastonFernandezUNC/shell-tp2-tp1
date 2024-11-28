@@ -12,6 +12,7 @@ normal:
 #	gcc  ${INC} handlers.c monitor.c main.c -g -c
 	gcc *.o -o main
 	rm *.o
+	mv main ../build/Shell
 
 clean:
 	rm *.o main a.out monitor

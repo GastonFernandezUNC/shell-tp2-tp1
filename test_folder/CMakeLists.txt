@@ -8,7 +8,6 @@ find_package(unity REQUIRED)
 add_executable( tests
         test.c
         ../src/cjson_handler.c
-        ../src/cJSON.c
         ../src/handlers.c
         ../src/monitor.c
         ../src/shell.c
