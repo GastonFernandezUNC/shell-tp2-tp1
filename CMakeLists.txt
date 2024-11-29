@@ -35,7 +35,7 @@ add_executable(${PROJECT_NAME} src/main.c
     )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE cjson::cjson)
-# target_link_libraries(${PROJECT_NAME} PRIVATE unity::unity)
+target_link_libraries(${PROJECT_NAME} PRIVATE unity::unity)
 
 # Flags for coverage
 set(CMAKE_C_FLAGS_DEBUG  "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
