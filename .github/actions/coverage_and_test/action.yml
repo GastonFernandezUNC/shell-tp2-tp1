@@ -25,7 +25,7 @@ runs:
         fi
 
         # run coverage of those tests and oputput to file
-        gcovr -r $PROJECT_PATH . >> $ERROR_FILE_FLAG
+        gcovr -r $PROJECT_PATH . --exclude Monitoring_project_so1>> $ERROR_FILE_FLAG
 
         echo "Runnig: gcovr -r $PROJECT_PATH ."
 
