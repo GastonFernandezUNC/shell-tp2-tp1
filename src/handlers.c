@@ -16,6 +16,7 @@ void env_vars(char** args, int args_count)
     }
 }
 
+// check for the use of the '<' and '>' operators
 int check_redir(char** args)
 {
     int i = 0;
@@ -30,6 +31,7 @@ int check_redir(char** args)
     return -1;
 }
 
+// actually handle the use of the '<' and '>' operators
 void redir_function(char** args)
 {
     int i = 0;
@@ -55,6 +57,7 @@ void redir_function(char** args)
     }
 }
 
+// check for the use of the '|' operator
 int check_pipe(char** args)
 {
 
@@ -73,6 +76,7 @@ int check_pipe(char** args)
     return commands;
 }
 
+// handle the use of the '|' operator
 void pipe_function(char** args, int command_count)
 {
     int pipes[command_count - 1][2];
@@ -145,6 +149,7 @@ void pipe_function(char** args, int command_count)
     }
 }
 
+// Function to handle internal and other functions of the shell
 int special_functions(char** args, char* PWD, char* OLDPWD, int* background_processes, int* monitor_pid)
 {
 
@@ -196,6 +201,7 @@ int special_functions(char** args, char* PWD, char* OLDPWD, int* background_proc
     return NOTHING;
 }
 
+// get the current dir
 void getCurrentPath(char* CWD, char* USER, char* HOSTNAME)
 {
     char tmp[MAX_CWD_BUFFER];
@@ -210,6 +216,7 @@ void getCurrentPath(char* CWD, char* USER, char* HOSTNAME)
     printf("%s@%s:%s$  ", USER, HOSTNAME, CWD);
 }
 
+// handle de use of the cd command
 void handle_cd(char** args, char* PWD, char* OLDPWD)
 {
 
@@ -269,6 +276,7 @@ void handle_cd(char** args, char* PWD, char* OLDPWD)
     }
 }
 
+// Function to read the command from a file
 char** commands_file(char* file, int* lines_amount)
 {
     FILE* fp;

@@ -88,6 +88,7 @@ int save_to_config_file(cJSON* json)
 
 int _write_json(cJSON* json, char* metric, bool option, int time)
 {
+    // sets the refresh time if it's greater than 0
     if (time > 0)
     {
         cJSON* refresh_time = cJSON_GetObjectItem(json, "refresh_time");
@@ -122,6 +123,7 @@ int _write_json(cJSON* json, char* metric, bool option, int time)
     return EXIT_SUCCESS;
 }
 
+// stablishes the configuration of the monitor
 int config_monitor(char** args)
 {
 

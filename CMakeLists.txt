@@ -15,7 +15,7 @@ enable_testing()
 # Flags for the compiler
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Wpedantic -Werror -Wunused-parameter -Wmissing-prototypes -Wstrict-prototypes")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fprofile-arcs -ftest-coverage")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -fprofile-arcs -ftest-coverage")
 
 # Include headers
 include_directories(include)
