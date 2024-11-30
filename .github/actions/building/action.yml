@@ -27,9 +27,3 @@ runs:
         cd build
         cmake .. -DCMAKE_TOOLCHAIN_FILE=./build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
         make
-
-    - name: CONFIG_MOVE
-      shell: bash
-      run: |
-        echo "Moving configuration files"
-        cp config.json build/

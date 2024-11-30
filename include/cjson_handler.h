@@ -8,7 +8,7 @@
 #include <string.h>
 #include <strings.h>
 
-#define PATH_TO_CONFIG_FILE "../config.json"
+#define PATH_TO_CONFIG_FILE "./metrics-tp1-so1/config.json"
 
 /**
  * @brief Define failed exit.

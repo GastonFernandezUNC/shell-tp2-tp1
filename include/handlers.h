@@ -109,6 +109,13 @@ int check_pipe(char** args);
 void pipe_function(char** args, int command_count);
 
 /**
+ * @brief Check if a string is empty or contains only whitespace characters.
+ * @param str the string.
+ * @return int
+ */
+int is_empty_or_whitespace(const char* str);
+
+/**
  * @brief Read the commands from a file.
  * @param file the file.
  * @param lines_amount the amount of lines.
