@@ -277,9 +277,12 @@ void handle_cd(char** args, char* PWD, char* OLDPWD)
 }
 
 // Function to read the command from a file
-int is_empty_or_whitespace(const char* str) {
-    while (*str) {
-        if (!isspace((unsigned char)*str)) {
+int is_empty_or_whitespace(const char* str)
+{
+    while (*str)
+    {
+        if (!isspace((unsigned char)*str))
+        {
             return 0; // Found a non-whitespace character
         }
         str++;
@@ -287,31 +290,38 @@ int is_empty_or_whitespace(const char* str) {
     return 1; // String is empty or all whitespace
 }
 
-char** commands_file(char* file, int* lines_amount) {
+char** commands_file(char* file, int* lines_amount)
+{
     FILE* fp;
 
     // Opening file
     fp = fopen(file, "r");
-    if (fp == NULL) {
+    if (fp == NULL)
+    {
         perror("Error opening file");
         return NULL;
-    } else {
+    }
+    else
+    {
         char** lines = NULL;
         char buffer[FILE_BUFFER_SIZE];
         *lines_amount = 0;
 
-        while (fgets(buffer, sizeof(buffer), fp)) {
+        while (fgets(buffer, sizeof(buffer), fp))
+        {
             // Remove newline character
             buffer[strcspn(buffer, "\n")] = '\0';
 
             // Check if the line is empty or contains only whitespace
-            if (is_empty_or_whitespace(buffer)) {
+            if (is_empty_or_whitespace(buffer))
+            {
                 continue;
             }
 
             // Increase the size of the dynamic array
             lines = realloc(lines, (*lines_amount + 1) * sizeof(char*));
-            if (!lines) {
+            if (!lines)
+            {
                 perror("Error reallocating memory");
                 fclose(fp);
                 return NULL;
@@ -319,7 +329,8 @@ char** commands_file(char* file, int* lines_amount) {
 
             // Store the line in the array
             lines[*lines_amount] = strdup(buffer);
-            if (!lines[*lines_amount]) {
+            if (!lines[*lines_amount])
+            {
                 perror("Error duplicating string");
                 fclose(fp);
                 return NULL;
