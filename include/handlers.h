@@ -3,8 +3,8 @@
 
 #include "cjson_handler.h"
 #include "monitor.h"
-#include <sys/wait.h>
 #include <ctype.h>
+#include <sys/wait.h>
 
 #define _GNU_SOURCE
 
