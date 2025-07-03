@@ -1,5 +1,7 @@
 #include "shell.h"
 
+int* ptr_current_child = NULL;
+
 // Function to read and parse the command
 void read_command(char* cmd, char* CWD, char* USER, char* HOSTNAME)
 {
@@ -50,6 +52,7 @@ void create_fork(char** args, bool background, int* current_child, int* backgrou
             int status;
             // wait(NULL);
             *current_child = pid;
+            ptr_current_child = current_child;
             waitpid(pid, &status, WUNTRACED);
 
             if (WIFSTOPPED(status))
@@ -75,14 +78,14 @@ void create_fork(char** args, bool background, int* current_child, int* backgrou
     }
 }
 
-void sig_handler(int signo, int* current_child)
+void sig_handler(int signo)//, int* current_child)
 {
-    if (*current_child > 0)
+    if (*ptr_current_child > 0)
     {
         // Envía SIGINT al proceso hijo actual
-        kill(*current_child, signo);
+        kill(*ptr_current_child, signo);
         // printf("");
-        *current_child = -1;
+        *ptr_current_child = -1;
     }
     else
     {

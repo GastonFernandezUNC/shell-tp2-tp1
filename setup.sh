@@ -1,8 +1,8 @@
-#!bin/bash
+#!/bin/bash
 
 delete()
 {
-	rm -rf build CMakeUserPresets.json
+	rm -rf build CMakeUserPresets.json || echo
 }
 
 setConan()

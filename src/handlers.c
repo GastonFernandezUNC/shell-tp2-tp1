@@ -41,6 +41,11 @@ void redir_function(char** args)
         {
             args[i] = NULL;
             int fd = open(args[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	    if(fd == -1)
+	    {
+		perror("open");
+		return;
+	    }
             dup2(fd, STDOUT_FILENO);
             close(fd);
             return;
@@ -49,7 +54,12 @@ void redir_function(char** args)
         {
             args[i] = NULL;
             int fd = open(args[i + 1], O_RDONLY);
-            dup2(fd, STDIN_FILENO);
+            if(fd == -1)
+	    {
+		perror("open");
+		return;
+	    }
+	    dup2(fd, STDIN_FILENO);
             close(fd);
             return;
         }
@@ -79,7 +89,14 @@ int check_pipe(char** args)
 // handle the use of the '|' operator
 void pipe_function(char** args, int command_count)
 {
+    if(command_count <= 1)
+    {
+	perror("Commanand count\n");
+	return;
+    }
     int pipes[command_count - 1][2];
+    memset(pipes, 0, sizeof(pipes));
+
     for (int i = 0; i < command_count - 1; i++)
     {
         if (pipe(pipes[i]) == -1)

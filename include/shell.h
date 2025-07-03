@@ -35,7 +35,7 @@ void create_fork(char** args, bool background, int* current_child, int* backgrou
  * @param signo the signal number.
  * @param current_child the current child process.
  */
-void sig_handler(int signo, int* current_child);
+void sig_handler(int signo);//, int* current_child);
 
 /**
  * @brief Sets the path to the configuration file.

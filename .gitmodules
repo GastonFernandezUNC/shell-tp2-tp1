@@ -1,3 +1,4 @@
 [submodule "metrics-tp1-so1"]
 	path = metrics-tp1-so1
 	url = https://github.com/GastonFernandezUNC/metrics-tp1-so1
+	branch = tp2_mod
