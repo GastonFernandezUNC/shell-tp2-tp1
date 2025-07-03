@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
     char *USER, HOSTNAME[MAX_CMD_LEN];
     int background_processes = 0;
     int current_child = -1;
-    //bool stop_requested = false;
+    // bool stop_requested = false;
     pid_t monitor_pid = -1;
 
     signal(SIGINT, sig_handler);
@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
     {
         int lines_amount = 0;
         char* file = argv[1];
-        //char buffer[FILE_BUFFER_SIZE];
+        // char buffer[FILE_BUFFER_SIZE];
         char** commands = commands_file(file, &lines_amount);
         int i = 0;
         while (i < lines_amount)

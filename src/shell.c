@@ -78,7 +78,7 @@ void create_fork(char** args, bool background, int* current_child, int* backgrou
     }
 }
 
-void sig_handler(int signo)//, int* current_child)
+void sig_handler(int signo) //, int* current_child)
 {
     if (*ptr_current_child > 0)
     {

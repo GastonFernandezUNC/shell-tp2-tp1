@@ -136,7 +136,7 @@ int config_monitor(char** args)
         printf(
             "\nInvalid argument\n\nValid arguments are\n-D -d: Deactivate\n-A -a: Activate\n-N -n: Set refresh time\n"
             "-help --h: Display help\n\n");
-	free(content);
+        free(content);
         return -1;
     }
 
@@ -196,7 +196,7 @@ int config_monitor(char** args)
 
     content = _get_json();
     printf("File content:\n%s", content);
-//    free(content);
+    //    free(content);
     cJSON_Delete(json);
     return EXIT_SUCCESS;
 }

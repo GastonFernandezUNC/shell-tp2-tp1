@@ -16,7 +16,7 @@ void start_monitor(int* background_processes, pid_t* monitor)
         char* args[] = {PATH_TO_METRICS, NULL};
         execvp(args[0], args);
     }
-    
+
     else
     {
         printf("Monitor started\n");
