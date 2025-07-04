@@ -40,8 +40,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE unity::unity)
 # Flags for coverage
 set(CMAKE_C_FLAGS_DEBUG  "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
 
-set(SOURCE_FILE "${CMAKE_SOURCE_DIR}/config.json")
-set(DESTINATION_FILE "${CMAKE_BINARY_DIR}/metrics-tp1-so1/config.json")
+set(SOURCE_FILE "${CMAKE_SOURCE_DIR}/shell-tp2-so1/config.json")
+set(DESTINATION_FILE "${CMAKE_BINARY_DIR}/shell-tp2-so1/metrics-tp1-so1/config.json")
 
 # Copy file at build time
 add_custom_target(CopyConfig ALL
