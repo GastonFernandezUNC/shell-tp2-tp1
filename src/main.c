@@ -1,4 +1,5 @@
 #include "shell.h"
+#include <string.h>
 
 // Main function
 int main(int argc, char* argv[])
@@ -59,6 +60,15 @@ int main(int argc, char* argv[])
 
     while (1)
     {
+        memset(cmd, 0, sizeof(cmd));
+        int args_i = 0;
+
+        /* Nullify previous arguments */
+        while (args[args_i] != NULL)
+        {
+            args[args_i] = NULL;
+            args_i++;
+        }
         read_command(cmd, CWD, USER, HOSTNAME); // Get the command from user
         if (strlen(cmd) == 0)
             continue; // Skip empty input

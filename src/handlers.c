@@ -1,4 +1,8 @@
 #include "handlers.h"
+#include "shell.h"
+#include <fenv.h>
+#include <string.h>
+#include <time.h>
 
 // Function to handle environment variables
 void env_vars(char** args, int args_count)
@@ -89,9 +93,25 @@ int check_pipe(char** args)
 // handle the use of the '|' operator
 void pipe_function(char** args, int command_count)
 {
+    int args_iter_0 = 0;
+    ;
+    char* copy_args[MAX_CMD_LEN];
+    // TODO this works by miracle. Use a deep copy instead.
+    while (args[args_iter_0] != NULL)
+    {
+        copy_args[args_iter_0] = args[args_iter_0];
+        args_iter_0++;
+    }
+    copy_args[args_iter_0] = NULL;
+
+    if (copy_args[args_iter_0] == NULL)
+    {
+        printf("\n");
+    }
+
     if (command_count <= 1)
     {
-        perror("Commanand count\n");
+        perror("Command count\n");
         return;
     }
     int pipes[command_count - 1][2];
@@ -213,6 +233,55 @@ int special_functions(char** args, char* PWD, char* OLDPWD, int* background_proc
     {
         config_monitor(args);
         return CONTINUE;
+    }
+
+    if (strcmp(args[0], "list_config_files") == 0)
+    {
+
+        bool f_recursive = false;
+
+        /* store the path where either 'find' or 'ls' will be applied */
+        char path[MAX_CWD_BUFFER] = "";
+
+        /* If there's an extra argument and it's '-r'  */
+        if (args[1] && strcmp(args[1], "-r") == 0)
+        {
+            f_recursive = true;
+        }
+
+        /* If the argument is not null, but also not '-r' then it's assumed to be a path */
+        else if (args[1])
+        {
+            strcpy(path, args[1]);
+        }
+
+        /* If the recursive flag is true, and there's an extra argument it's assumed to be a path */
+        if (f_recursive && args[2])
+        {
+            strcpy(path, args[2]);
+        }
+
+        /* Nullify previous arguments */
+        int args_i = 0;
+        while (args[args_i] != NULL)
+        {
+            args[args_i] = NULL;
+            args_i++;
+        }
+
+        char search_command_no_recursive[] = "ls ";
+        char search_command_recursive[] = "find ";
+        char grep_command[] = " | grep -P (\\.config|\\.json|\\.yaml)";
+
+        char search_command[MAX_CMD_LEN] = "";
+
+        strcat(search_command, f_recursive ? search_command_recursive : search_command_no_recursive);
+        strcat(search_command, path);
+        strcat(search_command, grep_command);
+
+        /* Break the command into separated arguments */
+        parse_command(search_command, args);
+        return FORK;
     }
 
     return NOTHING;

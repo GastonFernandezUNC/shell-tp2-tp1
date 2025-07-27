@@ -3,6 +3,7 @@
 
 #include "cjson_handler.h"
 #include "monitor.h"
+#include "shell.h"
 #include <ctype.h>
 #include <sys/wait.h>
 
