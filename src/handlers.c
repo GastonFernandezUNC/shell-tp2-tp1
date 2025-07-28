@@ -239,26 +239,37 @@ int special_functions(char** args, char* PWD, char* OLDPWD, int* background_proc
     {
 
         bool f_recursive = false;
+        bool f_cat_files = false;
 
         /* store the path where either 'find' or 'ls' will be applied */
         char path[MAX_CWD_BUFFER] = "";
 
-        /* If there's an extra argument and it's '-r'  */
-        if (args[1] && strcmp(args[1], "-r") == 0)
+        /* Iterate through all the arguments, checking for flags and a path */
+        int args_iter = 1;
+        while (args[args_iter])
         {
-            f_recursive = true;
-        }
+            if (!args[args_iter])
+            {
+                break;
+            }
 
-        /* If the argument is not null, but also not '-r' then it's assumed to be a path */
-        else if (args[1])
-        {
-            strcpy(path, args[1]);
-        }
+            if (strcmp(args[args_iter], "-r") == 0)
+            {
+                f_recursive = true;
+            }
 
-        /* If the recursive flag is true, and there's an extra argument it's assumed to be a path */
-        if (f_recursive && args[2])
-        {
-            strcpy(path, args[2]);
+            else if (strcmp(args[args_iter], "-c") == 0)
+            {
+                f_cat_files = true;
+            }
+
+            /* if not a flag, assume its a path. */
+            else
+            {
+                strcpy(path, args[args_iter]);
+            }
+
+            args_iter++;
         }
 
         /* Nullify previous arguments */
@@ -269,15 +280,20 @@ int special_functions(char** args, char* PWD, char* OLDPWD, int* background_proc
             args_i++;
         }
 
+        /* pre-set commands to give to the parser */
         char search_command_no_recursive[] = "ls ";
         char search_command_recursive[] = "find ";
         char grep_command[] = " | grep -P (\\.config|\\.json|\\.yaml)";
+        char cat_command[] = " | xargs -I {} cat {}";
 
+        /* storage variable */
         char search_command[MAX_CMD_LEN] = "";
 
+        /* fill the 'search_command' variable considering the flags, an path */
         strcat(search_command, f_recursive ? search_command_recursive : search_command_no_recursive);
         strcat(search_command, path);
         strcat(search_command, grep_command);
+        strcat(search_command, f_cat_files ? cat_command : " ");
 
         /* Break the command into separated arguments */
         parse_command(search_command, args);
