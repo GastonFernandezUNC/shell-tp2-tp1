@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
         int opc = special_functions(args, PWD, OLDPWD, &background_processes, &monitor_pid);
 
         bool background = false;
-        if (strcmp(args[arg_count - 1], "&") == 0)
+        if (args[arg_count] && strcmp(args[arg_count - 1], "&") == 0)
         {
             args[arg_count - 1] = NULL;
             background = true;

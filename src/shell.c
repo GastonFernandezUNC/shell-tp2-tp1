@@ -41,7 +41,7 @@ void create_fork(char** args, bool background, int* current_child, int* backgrou
         if (execvp(args[0], args) == -1)
         {
             perror("execvp failed");
-            exit(1);
+            exit(EXIT_FAILURE);
         }
     }
     else if (pid > 0)

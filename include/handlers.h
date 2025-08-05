@@ -30,6 +30,11 @@
 #define FILE_BUFFER_SIZE 1024
 
 /**
+ * @brief Define the maximum amount of bytes read from the STDOUT
+ */
+#define MAX_READ_STDOUT 32768
+
+/**
  * @brief Define the if to continue the while
  */
 #define CONTINUE 0
@@ -124,5 +129,12 @@ int is_empty_or_whitespace(const char* str);
  * @return char**
  */
 char** commands_file(char* file, int* lines_amount);
+
+/**
+ * @brief Parse all paths given by the ls|find command, and print the configuration files.
+ * @param paths. path to all the files to be parsed and printed.
+ * @param f_cat_files. Flag to know if only the path to the config files must be printed, or also their contents.
+ */
+void parse_config_files(char** paths, bool f_cat_files);
 
 #endif

@@ -1,9 +1,11 @@
 #include "handlers.h"
 #include "shell.h"
 #include <fenv.h>
+#include <stdio.h>
 #include <string.h>
 #include <time.h>
 
+#include <unistd.h>
 // Function to handle environment variables
 void env_vars(char** args, int args_count)
 {
@@ -150,7 +152,7 @@ void pipe_function(char** args, int command_count)
             }
 
             // Construir los argumentos del comando actual
-            char* cmd_args[100]; // Máximo de 100 argumentos
+            char* cmd_args[MAX_ARGS]; // Máximo de 100 argumentos
             int k = 0;
             while (args[cmd_start] != NULL && strcmp(args[cmd_start], "|") != 0)
             {
@@ -190,7 +192,7 @@ void pipe_function(char** args, int command_count)
 int special_functions(char** args, char* PWD, char* OLDPWD, int* background_processes, int* monitor_pid)
 {
 
-    if ((strcmp(args[0], "exit") == 0) || (strcmp(args[0], "quit") == 0))
+    if ((strcmp(args[0], "exit") == 0)  || (strcmp(args[0], "quit") == 0 || (strcmp(args[0], "q") == 0)))
     {
         if (*monitor_pid != -1)
         {
@@ -242,7 +244,21 @@ int special_functions(char** args, char* PWD, char* OLDPWD, int* background_proc
         bool f_cat_files = false;
 
         /* store the path where either 'find' or 'ls' will be applied */
-        char path[MAX_CWD_BUFFER] = "";
+        char path[MAX_CWD_BUFFER] = " ";
+        /* pre-set commands to give to the parser */
+        char search_command_no_recursive[] = "ls ";
+        char search_command_recursive[] = "find ";
+        //char grep_command[] = " | grep -P (\\.config|\\.json|\\.yaml)";
+        //char cat_command[] = " | xargs -I {} cat {}";
+
+        /* storage variable */
+        char** paths = malloc(MAX_READ_STDOUT * sizeof(char*));
+        if(!paths)
+        {
+            perror("Malloc error");
+            exit(EXIT_FAILURE);
+
+        }
 
         /* Iterate through all the arguments, checking for flags and a path */
         int args_iter = 1;
@@ -274,33 +290,120 @@ int special_functions(char** args, char* PWD, char* OLDPWD, int* background_proc
 
         /* Nullify previous arguments */
         int args_i = 0;
-        while (args[args_i] != NULL)
+        while (args[args_i])
         {
             args[args_i] = NULL;
             args_i++;
         }
 
-        /* pre-set commands to give to the parser */
-        char search_command_no_recursive[] = "ls ";
-        char search_command_recursive[] = "find ";
-        char grep_command[] = " | grep -P (\\.config|\\.json|\\.yaml)";
-        char cat_command[] = " | xargs -I {} cat {}";
+        int fd[2];
+        if(pipe(fd) == -1)
+        {
+            perror("Pipe creation failed.\n");
+            exit(EXIT_FAILURE);
+        }
 
-        /* storage variable */
-        char search_command[MAX_CMD_LEN] = "";
+        pid_t fid = fork();
+        if(fid == -1)
+        {
+            close(fd[0]);
+            close(fd[1]);
+            perror("Fork creation failed.\n");
+            return EXIT_FAILURE;
+        }
 
-        /* fill the 'search_command' variable considering the flags, an path */
-        strcat(search_command, f_recursive ? search_command_recursive : search_command_no_recursive);
-        strcat(search_command, path);
-        strcat(search_command, grep_command);
-        strcat(search_command, f_cat_files ? cat_command : " ");
+        if(fid == 0)
+        {
 
-        /* Break the command into separated arguments */
-        parse_command(search_command, args);
-        return FORK;
+            close(fd[0]);
+            dup2(fd[1], STDOUT_FILENO);
+            close(fd[1]);
+        
+            char search_command[MAX_CMD_LEN] = "";
+    
+            strcat(search_command, f_recursive ? search_command_recursive : search_command_no_recursive);
+            strcat(search_command, path);
+            //perror(search_command);
+            parse_command(search_command, args);
+            execvp(args[0], args);
+
+        }
+
+        else
+        {
+            close(fd[1]);
+            int counter = 0;
+			long unsigned int buffer_iter = 0;
+            char buffer[MAX_READ_STDOUT];
+            while((counter = read(fd[0], buffer, sizeof(buffer)-1)) > 0)
+            {
+                buffer[counter] = '\0';
+			    char* token = strtok(buffer, "\n");
+				while (token && buffer_iter < MAX_READ_STDOUT)
+				{
+				    paths[buffer_iter] = strdup(token); // Allocate memory
+				    if (!paths[buffer_iter]) {
+				        perror("strdup");
+				        break;
+				    }
+				    buffer_iter++;
+				    token = strtok(NULL, "\n");
+				}
+            }
+            close(fd[0]);
+            wait(NULL);
+
+			paths[buffer_iter] = NULL; // Null-terminate the list
+
+	        printf("Exploring Directory %s\n", strcmp(path, " ") != 0 ? path:PWD);
+	        parse_config_files(paths, f_cat_files);
+	
+	        for(long unsigned int paths_iter = 0; paths_iter < buffer_iter; paths_iter++)
+	        {
+	            free(paths[paths_iter]);
+	        }
+	        free(paths);
+	        return CONTINUE;
+        }
     }
 
     return NOTHING;
+}
+
+void parse_config_files(char** paths, bool f_cat_files)
+{
+    int iter = 0;
+    while(paths[iter])
+    {
+        if(strstr(paths[iter],".config") || strstr(paths[iter],".json") || strstr(paths[iter],".yaml"))
+        {
+            printf("Config File Found: %s\n",paths[iter]);
+            if(f_cat_files)
+            {
+                printf("Contents From %s\n", paths[iter]);
+                char* args[] = {"cat", paths[iter], NULL};
+                pid_t pid = fork();
+                if(pid == -1)
+                {
+                    perror("Fork failed\n");
+                    exit(EXIT_FAILURE);
+                }
+
+                if(pid == 0)
+                {
+                    execvp(args[0],args);
+                    perror("execvp failed\n");
+                }
+                else
+                {
+                    wait(NULL);
+                }
+            }
+        }
+
+        iter++;
+    }
+
 }
 
 // get the current dir
